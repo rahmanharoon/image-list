@@ -1,8 +1,10 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useCallback } from "react";
 import {
   View,
-  FlatList,
   Image,
+  FlatList,
+  Pressable,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
@@ -13,26 +15,34 @@ export interface IImage {
   url: string;
 }
 
-interface IScreenProps {
+interface IListScreenProps {
   columns: number;
   images: IImage[];
   fetchMore: () => void;
 }
 
-const GridScreen = ({
-  images,
-  columns,
-  fetchMore,
-}: IScreenProps) => {
+const ImageList = ({ images, columns, fetchMore }: IListScreenProps) => {
+  const { navigate } = useNavigation();
   const numColumns = columns || 2;
   const itemWidth = Dimensions.get("window").width / numColumns;
 
   const renderItem = useCallback(
-    ({ item }: { item: IImage }) => (
-      <View style={[styles.imageContainer, { width: itemWidth }]}>
-        <Image source={{ uri: item.url }} style={styles.image} />
-      </View>
-    ),
+    ({ item }: { item: IImage }) => {
+      const uri = item.url;
+      const onImageHandler = () =>
+        //   @ts-ignore
+        navigate("ImageScreen", {
+          uri,
+        });
+      return (
+        <Pressable
+          onPress={onImageHandler}
+          style={[styles.imageContainer, { width: itemWidth }]}
+        >
+          <Image source={{ uri }} style={styles.image} />
+        </Pressable>
+      );
+    },
     [itemWidth]
   );
 
@@ -67,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GridScreen;
+export default ImageList;
